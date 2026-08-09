@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ANSWER}}</title>
+<meta name="description" content="Where is Zach? {{ANSWER}}">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="whereiszach.net">
+<meta property="og:title" content="Where is Zach?">
+<meta property="og:description" content="{{ANSWER}}">
+<meta property="og:url" content="https://whereiszach.net/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Where is Zach?">
+<meta name="twitter:description" content="{{ANSWER}}">
+<link rel="canonical" href="https://whereiszach.net/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='78' x='50' text-anchor='middle' font-family='Times New Roman,serif' font-size='96'%3EZ%3C/text%3E%3C/svg%3E">
+<style>
+  :root { color-scheme: only light; }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    height: 100%;
+    background: #ffffff;
+    color: #000000;
+    font-family: "Times New Roman", Times, serif;
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 6vh 6vw;
+    gap: 4vh;
+  }
+
+  .question {
+    font-style: italic;
+    font-size: clamp(0.95rem, 2.2vw, 1.35rem);
+    color: #a8a8a8;
+    letter-spacing: 0.01em;
+  }
+
+  /* The box the answer is fitted into. Capped so one short word on a wide
+     desktop screen doesn't become a billboard. */
+  .stage {
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: 1100px;
+    height: 50vh;          /* definite: the fit script measures against it */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .answer {
+    font-size: clamp(2.5rem, 11vw, 9rem);   /* baseline if JS never runs */
+    line-height: 0.98;
+    letter-spacing: -0.025em;
+    max-width: 100%;
+    overflow-wrap: normal;   /* never break a word: shrink the type instead */
+    hyphens: none;
+    text-wrap: balance;
+  }
+
+  .meta {
+    font-style: italic;
+    font-size: clamp(0.8rem, 1.6vw, 1rem);
+    color: #c4c4c4;
+    line-height: 1.7;
+  }
+
+  .meta span { display: block; }
+
+  @media print {
+    .question, .meta { color: #999; }
+  }
+</style>
+</head>
+<body>
+  <p class="question">Where is Zach?</p>
+  <div class="stage"><h1 class="answer">{{ANSWER}}</h1></div>
+  <p class="meta">
+    <span>as of {{UPDATED}}</span>
+    <span>this page is the single source of truth</span>
+  </p>
+
+<script>
+// Grow or shrink the answer to the largest size that still fits the stage, so a
+// one-word answer and a full sentence are both laid out on purpose. Binary
+// search: ~14 layout passes on a single element, imperceptible.
+(function () {
+  var stage = document.querySelector('.stage');
+  var answer = document.querySelector('.answer');
+  var range = document.createRange();
+  var MIN = 14;
+
+  // Measure the text itself, not the <h1> box. An element with overflow:visible
+  // reports scrollWidth == clientWidth even when its text spills past the edge,
+  // so measuring the box would hide exactly the case we are trying to catch.
+  function fits(px) {
+    answer.style.fontSize = px + 'px';
+    range.selectNodeContents(answer);
+    var r = range.getBoundingClientRect();
+    return r.width <= stage.clientWidth - 1 &&
+           r.height <= stage.clientHeight - 1;
+  }
+
+  function fit() {
+    answer.style.fontSize = '';
+    // Ceiling, so a three-letter answer on a wide monitor stays a word and
+    // not a billboard.
+    var lo = MIN, hi = Math.min(240, innerWidth * 0.28);
+    if (fits(hi)) return;                 // short answer: take the ceiling
+    for (var i = 0; i < 14; i++) {
+      var mid = (lo + hi) / 2;
+      if (fits(mid)) { lo = mid; } else { hi = mid; }
+    }
+    answer.style.fontSize = lo + 'px';
+  }
+
+  fit();
+  addEventListener('resize', fit);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+})();
+</script>
+</body>
+</html>
