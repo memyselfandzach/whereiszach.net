@@ -38,25 +38,47 @@ def load(name: str) -> dict:
     return data if isinstance(data, dict) else {}
 
 
-def feed(items: list) -> str:
-    """The Ask Zach list. Unanswered questions are shown, just quietly."""
-    rows = []
+def clean(items: list) -> list:
+    """Only well-formed questions, newest first. The blob is world-writable."""
+    out = []
     for item in items:
         if not isinstance(item, dict):
             continue
         question = str(item.get("q", "")).strip()
         if not question:
             continue
-        answer = str(item.get("a") or "").strip()
-        body = (
-            f'<p class="a">{html.escape(answer)}</p>' if answer
-            else '<p class="a pending">awaiting an answer</p>'
-        )
-        rows.append(f'<li><p class="q">{html.escape(question)}</p>{body}</li>')
+        try:
+            stamp = int(item.get("ts", 0))
+        except (TypeError, ValueError):
+            stamp = 0
+        out.append({
+            "id": str(item.get("id", "")).strip(),
+            "q": question,
+            "a": str(item.get("a") or "").strip(),
+            "ts": stamp,
+        })
+    out.sort(key=lambda q: q["ts"], reverse=True)
+    return out
 
-    if not rows:
-        return '<p class="pending">No questions yet.</p>'
-    return '<ul class="feed">' + "".join(rows) + "</ul>"
+
+def feed(items: list) -> str:
+    """The Ask Zach list, rendered server-side so it works without JavaScript."""
+    if not items:
+        return '<p class="empty">No questions yet. Be the first.</p>'
+
+    rows = []
+    for item in items:
+        answered = "true" if item["a"] else "false"
+        body = (
+            f'<p class="a">{html.escape(item["a"])}</p>' if item["a"]
+            else '<p class="a waiting">awaiting an answer</p>'
+        )
+        ident = f' data-id="{html.escape(item["id"], quote=True)}"' if item["id"] else ""
+        rows.append(
+            f'<li data-answered="{answered}"{ident}>'
+            f'<p class="q">{html.escape(item["q"])}</p>{body}</li>'
+        )
+    return '<ul class="feed" data-filter="all">' + "".join(rows) + "</ul>"
 
 
 def render(template: str, **fields: str) -> str:
@@ -68,7 +90,12 @@ def render(template: str, **fields: str) -> str:
 
 def main() -> None:
     answer = str(load("answer.json").get("answer", "")).strip() or "Unclear"
-    questions = load("questions.json").get("questions") or []
+    questions = clean(load("questions.json").get("questions") or [])
+
+    # The same list twice: as HTML for readers without JavaScript, and as JSON
+    # for the script that merges in anything not yet harvested from the inbox.
+    # </script> inside a question would otherwise close this block early.
+    archive = json.dumps({"questions": questions}, ensure_ascii=False).replace("</", "<\\/")
 
     if OUT.exists():
         shutil.rmtree(OUT)
@@ -77,11 +104,16 @@ def main() -> None:
         render("template.html", ANSWER=html.escape(answer, quote=True))
     )
     (OUT / "ask.html").write_text(
-        render("ask.template.html", QUESTIONS=feed(questions))
+        render("ask.template.html", QUESTIONS=feed(questions), ARCHIVE_JSON=archive)
     )
     shutil.copy(ROOT / "CNAME", OUT / "CNAME")
 
-    waiting = sum(1 for q in questions if not str(q.get("a") or "").strip())
+    # The browser reads this to find today's inbox, so it ships with the site.
+    inbox = ROOT / "inbox.json"
+    if inbox.exists():
+        shutil.copy(inbox, OUT / "inbox.json")
+
+    waiting = sum(1 for q in questions if not q["a"])
     print(f'Built _site -> "{answer}"')
     print(f"  ask.html -> {len(questions)} question(s), {waiting} awaiting an answer")
 
