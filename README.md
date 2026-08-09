@@ -16,13 +16,37 @@ the text between the quotes, commit.
 ./update.sh "Somewhere in Ohio"
 ```
 
+## Ask Zach
+
+The `ask zach` link at the bottom of the front page goes to `/ask.html`: a feed of
+questions, and a button to ask a new one. Asking opens a GitHub issue — there is no
+server here, so the issue tracker is the inbox. (That does mean asking requires a
+GitHub account.)
+
+Answering is the same move as changing the answer: edit
+[`questions.json`](questions.json). Newest first.
+
+```json
+{
+  "questions": [
+    { "q": "Are you ever coming back to Chicago?", "a": "Sooner than you think." },
+    { "q": "Best bar in Denver?" }
+  ]
+}
+```
+
+A question with no `a` still shows up on the page, marked *awaiting an answer*. Fill
+in the `a` and it publishes. Close the matching issue when you have answered it.
+
 ## How it works
 
 | File | Job |
 | --- | --- |
-| `answer.json` | The answer. The only file you edit. |
-| `template.html` | The page, with an `{{ANSWER}}` placeholder. |
-| `build.py` | Fills the placeholder, writes `_site/index.html`. |
+| `answer.json` | The answer. The file you edit most. |
+| `questions.json` | The Ask Zach feed: questions and their answers. |
+| `template.html` | The front page, with an `{{ANSWER}}` placeholder. |
+| `ask.template.html` | The ask page, with a `{{QUESTIONS}}` placeholder. |
+| `build.py` | Fills the placeholders, writes `_site/`. Also owns the favicon. |
 | `CNAME` | Points GitHub Pages at the custom domain. |
 | `.github/workflows/deploy.yml` | Runs the build and deploys on every push to `main`. |
 

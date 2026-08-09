@@ -14,7 +14,7 @@
 <meta name="twitter:title" content="Where is Zach?">
 <meta name="twitter:description" content="{{ANSWER}}">
 <link rel="canonical" href="https://whereiszach.net/">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='78' x='50' text-anchor='middle' font-family='Times New Roman,serif' font-size='96'%3EZ%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="{{FAVICON}}">
 <style>
   :root { color-scheme: only light; }
 
@@ -30,6 +30,7 @@
   }
 
   body {
+    position: relative;   /* anchors the ask link to the page, not the stage */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -68,14 +69,32 @@
     text-wrap: balance;
   }
 
+  /* Out of the centred composition entirely, so the answer stays optically
+     centred no matter how long it is. */
+  .ask {
+    position: absolute;
+    left: 50%;
+    bottom: 3vh;
+    transform: translateX(-50%);
+    font-size: 9pt;
+    font-style: italic;
+    color: #c4c4c4;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .ask:hover { color: #000000; }
+
   @media print {
     .question { color: #999; }
+    .ask { display: none; }
   }
 </style>
 </head>
 <body>
   <p class="question">Where is Zach?</p>
   <div class="stage"><h1 class="answer">{{ANSWER}}</h1></div>
+  <a class="ask" href="ask.html">ask zach</a>
 
 <script>
 // Grow or shrink the answer to the largest size that still fits the stage, so a

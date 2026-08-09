@@ -1,0 +1,12 @@
+name: Ask Zach a question
+description: Ask anything. Answered questions get posted on whereiszach.net/ask.html
+title: "Question: "
+labels: ["question"]
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: Your question
+      placeholder: What do you want to ask Zach?
+    validations:
+      required: true
