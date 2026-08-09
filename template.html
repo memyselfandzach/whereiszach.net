@@ -68,27 +68,14 @@
     text-wrap: balance;
   }
 
-  .meta {
-    font-style: italic;
-    font-size: clamp(0.8rem, 1.6vw, 1rem);
-    color: #c4c4c4;
-    line-height: 1.7;
-  }
-
-  .meta span { display: block; }
-
   @media print {
-    .question, .meta { color: #999; }
+    .question { color: #999; }
   }
 </style>
 </head>
 <body>
   <p class="question">Where is Zach?</p>
   <div class="stage"><h1 class="answer">{{ANSWER}}</h1></div>
-  <p class="meta">
-    <span>as of {{UPDATED}}</span>
-    <span>this page is the single source of truth</span>
-  </p>
 
 <script>
 // Grow or shrink the answer to the largest size that still fits the stage, so a

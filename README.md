@@ -16,17 +16,13 @@ the text between the quotes, commit.
 ./update.sh "Somewhere in Ohio"
 ```
 
-The "as of" date is taken from the commit that last changed `answer.json`, so there
-is nothing else to update. To override it, add an `"updated"` field to `answer.json`
-and it will be printed verbatim.
-
 ## How it works
 
 | File | Job |
 | --- | --- |
 | `answer.json` | The answer. The only file you edit. |
-| `template.html` | The page, with `{{ANSWER}}` / `{{UPDATED}}` placeholders. |
-| `build.py` | Fills the placeholders, writes `_site/index.html`. |
+| `template.html` | The page, with an `{{ANSWER}}` placeholder. |
+| `build.py` | Fills the placeholder, writes `_site/index.html`. |
 | `CNAME` | Points GitHub Pages at the custom domain. |
 | `.github/workflows/deploy.yml` | Runs the build and deploys on every push to `main`. |
 
