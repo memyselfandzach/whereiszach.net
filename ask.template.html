@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ask Zach</title>
+<meta name="description" content="Ask Zach a question.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="whereiszach.net">
+<meta property="og:title" content="Ask Zach">
+<meta property="og:description" content="Ask Zach a question.">
+<meta property="og:url" content="https://whereiszach.net/ask.html">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Ask Zach">
+<meta name="twitter:description" content="Ask Zach a question.">
+<link rel="canonical" href="https://whereiszach.net/ask.html">
+<link rel="icon" href="{{FAVICON}}">
+<style>
+  :root { color-scheme: only light; }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html {
+    background: #ffffff;
+    color: #000000;
+    font-family: "Times New Roman", Times, serif;
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  /* A reading column, not a viewport-fitted poster: this page scrolls. */
+  body {
+    max-width: 34rem;
+    margin: 0 auto;
+    padding: 12vh 8vw 14vh;
+  }
+
+  a { color: inherit; }
+
+  .back {
+    display: inline-block;
+    font-style: italic;
+    font-size: 9pt;
+    color: #a8a8a8;
+    text-decoration: none;
+  }
+
+  .back:hover { color: #000000; }
+
+  h1 {
+    margin-top: 1.6rem;
+    font-size: clamp(2.2rem, 7vw, 3.4rem);
+    line-height: 1;
+    letter-spacing: -0.025em;
+  }
+
+  .cta {
+    display: inline-block;
+    margin-top: 1.4rem;
+    font-style: italic;
+    font-size: clamp(1rem, 2.4vw, 1.2rem);
+    color: #000000;
+    text-underline-offset: 0.22em;
+    text-decoration-color: #cccccc;
+  }
+
+  .cta:hover { text-decoration-color: #000000; }
+
+  .note {
+    margin-top: 0.7rem;
+    font-size: 9pt;
+    font-style: italic;
+    color: #c4c4c4;
+    line-height: 1.6;
+  }
+
+  .feed {
+    list-style: none;
+    margin-top: 5vh;
+    border-top: 1px solid #ececec;
+  }
+
+  .feed li {
+    padding: 2rem 0;
+    border-bottom: 1px solid #ececec;
+  }
+
+  .q {
+    font-size: clamp(1.15rem, 3vw, 1.4rem);
+    line-height: 1.3;
+    letter-spacing: -0.015em;
+  }
+
+  .a {
+    margin-top: 0.55rem;
+    font-style: italic;
+    color: #6b6b6b;
+    line-height: 1.55;
+  }
+
+  /* Asked, not yet answered. Deliberately quiet. */
+  .pending {
+    margin-top: 5vh;
+    font-style: italic;
+    color: #c4c4c4;
+  }
+
+  .a.pending { margin-top: 0.55rem; }
+
+  @media print {
+    .back, .note, .pending { color: #999; }
+  }
+</style>
+</head>
+<body>
+  <a class="back" href="index.html">&larr; Where is Zach?</a>
+  <h1>Ask Zach</h1>
+  <p><a class="cta" href="https://github.com/memyselfandzach/whereiszach.net/issues/new?labels=question&amp;template=question.yml">Ask a question &rarr;</a></p>
+  <p class="note">Questions are posted publicly here once Zach answers them.</p>
+  {{QUESTIONS}}
+</body>
+</html>
