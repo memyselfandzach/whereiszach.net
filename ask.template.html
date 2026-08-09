@@ -4,15 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ask Zach</title>
-<meta name="description" content="Ask Zach a question.">
+<meta name="description" content="Ask Zach a question. No account, no name required.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="whereiszach.net">
 <meta property="og:title" content="Ask Zach">
-<meta property="og:description" content="Ask Zach a question.">
+<meta property="og:description" content="Ask Zach a question. No account, no name required.">
 <meta property="og:url" content="https://whereiszach.net/ask.html">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Ask Zach">
-<meta name="twitter:description" content="Ask Zach a question.">
+<meta name="twitter:description" content="Ask Zach a question. No account, no name required.">
 <link rel="canonical" href="https://whereiszach.net/ask.html">
 <link rel="icon" href="{{FAVICON}}">
 <style>
@@ -32,7 +32,7 @@
   body {
     max-width: 34rem;
     margin: 0 auto;
-    padding: 12vh 8vw 14vh;
+    padding: 10vh 8vw 14vh;
   }
 
   a { color: inherit; }
@@ -48,40 +48,102 @@
   .back:hover { color: #000000; }
 
   h1 {
-    margin-top: 1.6rem;
+    margin-top: 1.4rem;
     font-size: clamp(2.2rem, 7vw, 3.4rem);
     line-height: 1;
     letter-spacing: -0.025em;
   }
 
-  .cta {
-    display: inline-block;
-    margin-top: 1.4rem;
-    font-style: italic;
-    font-size: clamp(1rem, 2.4vw, 1.2rem);
-    color: #000000;
-    text-underline-offset: 0.22em;
-    text-decoration-color: #cccccc;
-  }
-
-  .cta:hover { text-decoration-color: #000000; }
-
-  .note {
+  .lede {
     margin-top: 0.7rem;
-    font-size: 9pt;
     font-style: italic;
+    font-size: 9pt;
     color: #c4c4c4;
     line-height: 1.6;
   }
 
-  .feed {
-    list-style: none;
-    margin-top: 5vh;
-    border-top: 1px solid #ececec;
+  form { margin-top: 1.8rem; }
+
+  textarea {
+    width: 100%;
+    min-height: 5.5rem;
+    padding: 0.85rem 1rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    background: #ffffff;
+    color: #000000;
+    font-family: inherit;
+    font-size: 1.05rem;
+    line-height: 1.45;
+    resize: vertical;
   }
 
+  textarea:focus { outline: none; border-color: #000000; }
+  textarea::placeholder { color: #c4c4c4; font-style: italic; }
+
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 0.7rem;
+  }
+
+  button {
+    padding: 0.5rem 1.4rem;
+    border: 1px solid #000000;
+    border-radius: 2px;
+    background: #000000;
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 1rem;
+    font-style: italic;
+    cursor: pointer;
+  }
+
+  button:hover:not(:disabled) { background: #ffffff; color: #000000; }
+  button:disabled { opacity: 0.35; cursor: default; }
+
+  .status { font-style: italic; font-size: 9pt; color: #a8a8a8; }
+  .status[data-tone="bad"] { color: #a33; }
+
+  /* Off-screen rather than display:none -- a bot filling the form in reads the
+     DOM, not the stylesheet, so it happily types in here and gives itself up. */
+  .trap {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 1.1rem;
+    margin-top: 5vh;
+    padding-bottom: 0.7rem;
+    border-bottom: 1px solid #ececec;
+  }
+
+  .tab {
+    border: 0;
+    padding: 0;
+    background: none;
+    color: #c4c4c4;
+    font-family: inherit;
+    font-size: 9pt;
+    font-style: italic;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .tab:hover { background: none; color: #6b6b6b; }
+  .tab[aria-selected="true"] { color: #000000; }
+
+  .feed { list-style: none; }
+
   .feed li {
-    padding: 2rem 0;
+    padding: 1.9rem 0;
     border-bottom: 1px solid #ececec;
   }
 
@@ -98,25 +160,245 @@
     line-height: 1.55;
   }
 
-  /* Asked, not yet answered. Deliberately quiet. */
-  .pending {
-    margin-top: 5vh;
+  .a.waiting { color: #c4c4c4; }
+
+  .empty {
+    margin-top: 2.4rem;
     font-style: italic;
     color: #c4c4c4;
   }
 
-  .a.pending { margin-top: 0.55rem; }
+  /* The filter is pure CSS on a container class, so it costs nothing and keeps
+     working if the merge script fails. */
+  .feed[data-filter="answered"] li[data-answered="false"],
+  .feed[data-filter="unanswered"] li[data-answered="true"] { display: none; }
 
   @media print {
-    .back, .note, .pending { color: #999; }
+    form, .tabs, .back, .lede { display: none; }
   }
 </style>
 </head>
 <body>
   <a class="back" href="index.html">&larr; Where is Zach?</a>
   <h1>Ask Zach</h1>
-  <p><a class="cta" href="https://github.com/memyselfandzach/whereiszach.net/issues/new?labels=question&amp;template=question.yml">Ask a question &rarr;</a></p>
-  <p class="note">Questions are posted publicly here once Zach answers them.</p>
+  <p class="lede">No account, no name, no email. Ask and it posts here.</p>
+
+  <form id="ask" autocomplete="off">
+    <textarea id="text" maxlength="500" required
+      placeholder="What do you want to ask Zach?" aria-label="Your question"></textarea>
+    <p class="trap" aria-hidden="true">
+      <label>Leave this empty<input type="text" id="trap" tabindex="-1" autocomplete="off"></label>
+    </p>
+    <div class="row">
+      <button type="submit" id="send">Ask</button>
+      <span class="status" id="status"></span>
+    </div>
+  </form>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" data-show="all" aria-selected="true">All</button>
+    <button class="tab" role="tab" data-show="answered" aria-selected="false">Answered</button>
+    <button class="tab" role="tab" data-show="unanswered" aria-selected="false">Unanswered</button>
+  </div>
+
   {{QUESTIONS}}
+
+<script id="archive" type="application/json">{{ARCHIVE_JSON}}</script>
+<script>
+(function () {
+  var MIN = 3, MAX = 500, COOLDOWN = 20000, PER_DAY = 12, INBOX_CAP = 400;
+
+  var form = document.getElementById('ask');
+  var text = document.getElementById('text');
+  var trap = document.getElementById('trap');
+  var send = document.getElementById('send');
+  var note = document.getElementById('status');
+  var feed = document.querySelector('.feed');
+  var empty = document.querySelector('.empty');
+
+  var archive = [];
+  try { archive = JSON.parse(document.getElementById('archive').textContent).questions || []; }
+  catch (e) { archive = []; }
+
+  function say(message, tone) {
+    note.textContent = message || '';
+    if (tone) { note.setAttribute('data-tone', tone); } else { note.removeAttribute('data-tone'); }
+  }
+
+  // ---- rendering -------------------------------------------------------
+  // Always textContent, never innerHTML: every question here was typed by an
+  // anonymous stranger and must never be parsed as markup.
+  function row(item) {
+    var li = document.createElement('li');
+    var answered = !!(item.a && String(item.a).trim());
+    li.setAttribute('data-answered', answered ? 'true' : 'false');
+    if (item.id) { li.setAttribute('data-id', item.id); }
+
+    var q = document.createElement('p');
+    q.className = 'q';
+    q.textContent = item.q;
+    li.appendChild(q);
+
+    var a = document.createElement('p');
+    a.className = answered ? 'a' : 'a waiting';
+    a.textContent = answered ? String(item.a).trim() : 'awaiting an answer';
+    li.appendChild(a);
+    return li;
+  }
+
+  function paint(items) {
+    if (!items.length) { return; }
+    if (!feed) {
+      feed = document.createElement('ul');
+      feed.className = 'feed';
+      feed.setAttribute('data-filter', current);
+      (empty || document.body).parentNode.insertBefore(feed, empty || null);
+    }
+    if (empty) { empty.remove(); empty = null; }
+    feed.textContent = '';
+    items.forEach(function (item) { feed.appendChild(row(item)); });
+  }
+
+  function merge(live) {
+    var seen = {}, all = [];
+    archive.concat(live).forEach(function (item) {
+      if (!item || typeof item.q !== 'string') { return; }
+      var q = item.q.trim();
+      if (q.length < MIN || q.length > MAX) { return; }
+      var key = item.id || q.toLowerCase();
+      if (seen[key]) { return; }
+      seen[key] = 1;
+      all.push({ id: item.id, q: q, a: item.a, ts: Number(item.ts) || 0 });
+    });
+    all.sort(function (x, y) { return y.ts - x.ts; });
+    return all;
+  }
+
+  var current = 'all';
+  document.querySelectorAll('.tab').forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      current = tab.getAttribute('data-show');
+      document.querySelectorAll('.tab').forEach(function (other) {
+        other.setAttribute('aria-selected', String(other === tab));
+      });
+      if (feed) { feed.setAttribute('data-filter', current); }
+    });
+  });
+
+  // ---- the inbox -------------------------------------------------------
+  // A pointer file, fetched fresh, so a cached page still finds today's blob.
+  function inbox() {
+    return fetch('inbox.json?t=' + Date.now(), { cache: 'no-store' })
+      .then(function (r) { return r.ok ? r.json() : {}; })
+      .then(function (data) {
+        var urls = [];
+        if (data.current && data.current.url) { urls.push(data.current.url); }
+        (data.draining || []).forEach(function (d) { if (d && d.url) { urls.push(d.url); } });
+        return urls;
+      })
+      .catch(function () { return []; });
+  }
+
+  function pull(urls) {
+    return Promise.all(urls.map(function (url) {
+      return fetch(url, { cache: 'no-store' })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (d) { return (d && Array.isArray(d.questions)) ? d.questions : []; })
+        .catch(function () { return []; });
+    })).then(function (lists) { return [].concat.apply([], lists); });
+  }
+
+  // Held onto: re-merging against an empty list after a submit would drop
+  // everyone else's questions, which only exist in the inbox until harvest.
+  var live = [];
+  var urlsReady = inbox();
+  urlsReady
+    .then(pull)
+    .then(function (items) { live = items; paint(merge(live)); })
+    .catch(function () { /* the built-in archive is already on the page */ });
+
+  // ---- asking ----------------------------------------------------------
+  // Compare-and-swap on the blob's ETag: two people asking at the same instant
+  // would otherwise silently overwrite each other.
+  function post(url, item) {
+    return fetch(url, { cache: 'no-store' }).then(function (res) {
+      if (!res.ok) { throw new Error('gone'); }
+      var etag = res.headers.get('ETag');
+      return res.json().catch(function () { return {}; }).then(function (data) {
+        var list = Array.isArray(data.questions) ? data.questions : [];
+        if (list.length >= INBOX_CAP) { list = list.slice(list.length - INBOX_CAP + 1); }
+        var headers = { 'Content-Type': 'application/json' };
+        if (etag) { headers['If-Match'] = etag; }
+        return fetch(url, {
+          method: 'PUT',
+          headers: headers,
+          body: JSON.stringify({ questions: list.concat([item]) })
+        });
+      });
+    });
+  }
+
+  function deliver(item) {
+    return urlsReady.then(function (urls) {
+      if (!urls.length) { throw new Error('no inbox'); }
+      var attempt = 0;
+
+      function tryUrl(index) {
+        if (index >= urls.length) { throw new Error('unreachable'); }
+        return post(urls[index], item).then(function (res) {
+          if (res.ok) { return item; }
+          if (res.status === 412 && attempt++ < 4) { return tryUrl(index); }  // conflict, retry
+          return tryUrl(index + 1);
+        }, function () { return tryUrl(index + 1); });
+      }
+      return tryUrl(0);
+    });
+  }
+
+  function throttled() {
+    try {
+      var log = JSON.parse(localStorage.getItem('askzach') || '[]');
+      var now = Date.now();
+      log = log.filter(function (t) { return now - t < 86400000; });
+      if (log.length && now - log[log.length - 1] < COOLDOWN) { return 'one moment, then ask again'; }
+      if (log.length >= PER_DAY) { return "that's a lot of questions for one day"; }
+      log.push(now);
+      localStorage.setItem('askzach', JSON.stringify(log));
+    } catch (e) { /* private mode: let it through */ }
+    return null;
+  }
+
+  form.addEventListener('submit', function (event) {
+    event.preventDefault();
+    var question = text.value.replace(/\s+/g, ' ').trim();
+
+    if (trap.value) { say('thanks', null); form.reset(); return; }   // a bot
+    if (question.length < MIN) { say('a little longer, please', 'bad'); return; }
+    if (question.length > MAX) { say('a little shorter, please', 'bad'); return; }
+
+    var wait = throttled();
+    if (wait) { say(wait, 'bad'); return; }
+
+    var item = {
+      id: 'q' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8),
+      q: question,
+      ts: Math.floor(Date.now() / 1000)
+    };
+
+    send.disabled = true;
+    say('sending…', null);
+    deliver(item).then(function () {
+      form.reset();
+      send.disabled = false;
+      say('asked. it will stay here until Zach answers.', null);
+      live = live.concat([item]);
+      paint(merge(live));
+    }, function () {
+      send.disabled = false;
+      say('could not reach the inbox — try again in a minute', 'bad');
+    });
+  });
+})();
+</script>
 </body>
 </html>

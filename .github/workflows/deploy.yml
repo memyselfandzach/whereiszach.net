@@ -3,16 +3,21 @@ name: Deploy
 on:
   push:
     branches: [main]
+  # Drains the question inbox on a loop. Blobs expire 24h after they are
+  # created, so this also has to run often enough to rotate the inbox long
+  # before that.
+  schedule:
+    - cron: '*/15 * * * *'
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write   # harvested questions are committed back to the repo
   pages: write
   id-token: write
 
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false   # a cancelled run could drop questions mid-harvest
 
 jobs:
   build:
@@ -22,6 +27,24 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+
+      - name: Harvest the question inbox
+        id: harvest
+        run: python harvest.py
+
+      - name: Commit anything new
+        if: steps.harvest.outputs.changed == 'true'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add questions.json inbox.json
+          git diff --cached --quiet && exit 0
+          git commit -m "Harvest questions from the inbox"
+          # A racing push just means these land on the next run; the blob holds
+          # them for 24h, so losing this push loses nothing.
+          git pull --rebase --autostash origin main && git push || \
+            echo "push skipped; will retry next run"
+
       - run: python build.py
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
